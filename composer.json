@@ -1,5 +1,6 @@
 {
     "name": "kminek/comment-scraper",
+    "description": "PHP script extracting comments from web pages",
     "authors": [
         {
             "name": "Grzesiek W",
