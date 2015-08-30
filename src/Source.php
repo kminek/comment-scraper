@@ -65,6 +65,13 @@ abstract class Source
     protected $source;
 
     /**
+     * Request options
+     *
+     * @var array
+     */
+    protected $requestOptions = [];
+
+    /**
      * Constructor
      *
      * @param array $options
@@ -76,6 +83,20 @@ abstract class Source
                 $this->{$key} = $value;
             }
         }
+    }
+
+    /**
+     * Get/set request options
+     *
+     * @param [type] $options
+     * @return [type]
+     */
+    public function requestOptions($options = null)
+    {
+        if ($options === null) {
+            return $this->requestOptions;
+        }
+        $this->requestOptions = $options;
     }
 
     /**
@@ -148,7 +169,7 @@ abstract class Source
             $url = $this->url();
             $this->scraper->log(['Source URL request', $this->key(), $url]);
             $this->status = static::STATUS_WAITING;
-            return $this->scraper->client()->getAsync($url);
+            return $this->scraper->client()->getAsync($url, $this->requestOptions());
         }
         if ($this->status === static::STATUS_COMMENTS) { // has comments
             if (empty($this->comments)) {
