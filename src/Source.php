@@ -3,14 +3,13 @@
 namespace CommentScraper;
 
 use Sunra\PhpSimple\HtmlDomParser;
+use ReflectionClass;
 
 /**
  * Source
  */
 abstract class Source
 {
-    use LoggerTrait;
-
     const STATUS_NEW = 0;
     const STATUS_WAITING = 1;
     const STATUS_COMMENTS = 2;
@@ -52,6 +51,27 @@ abstract class Source
     protected $comments = [];
 
     /**
+     * Class to wrap comment data within
+     *
+     * @var string|bool
+     */
+    protected $commentClass = '\\CommentScraper\\Comment';
+
+    /**
+     * Short source class name
+     *
+     * @var string
+     */
+    protected $source;
+
+    /**
+     * Request options
+     *
+     * @var array
+     */
+    protected $requestOptions = [];
+
+    /**
      * Constructor
      *
      * @param array $options
@@ -63,6 +83,34 @@ abstract class Source
                 $this->{$key} = $value;
             }
         }
+    }
+
+    /**
+     * Get/set request options
+     *
+     * @param [type] $options
+     * @return [type]
+     */
+    public function requestOptions($options = null)
+    {
+        if ($options === null) {
+            return $this->requestOptions;
+        }
+        $this->requestOptions = $options;
+    }
+
+    /**
+     * Return short source class name
+     *
+     * @return string
+     */
+    public function source()
+    {
+        if ($this->source === null) {
+            $reflect = new ReflectionClass($this);
+            $this->source = $reflect->getShortName();
+        }
+        return $this->source;
     }
 
     /**
@@ -119,16 +167,22 @@ abstract class Source
     {
         if ($this->status === static::STATUS_NEW) {
             $url = $this->url();
-            $this->log(['Source URL request', $this->key(), $url]);
+            $this->scraper->log(['Source URL request', $this->key(), $url]);
             $this->status = static::STATUS_WAITING;
-            return $this->scraper->client()->getAsync($url);
+            return $this->scraper->client()->getAsync($url, $this->requestOptions());
         }
         if ($this->status === static::STATUS_COMMENTS) { // has comments
             if (empty($this->comments)) {
                 $this->status = ($this->paginated === false) ? static::STATUS_COMPLETED : static::STATUS_NEW;
             } else {
                 $comment = array_shift($this->comments);
-                return $comment;
+                if ($this->commentClass === false) {
+                    return $comment;
+                }
+                $commentClass = $this->commentClass;
+                $commentObj = new $commentClass($comment);
+                $commentObj->source($this->source());
+                return $commentObj;
             }
         }
         return $this->status();

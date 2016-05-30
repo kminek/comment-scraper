@@ -86,12 +86,12 @@ class Scraper
      */
     public function __construct($options = [])
     {
-        $this->log('Scraper created');
         foreach ($options as $key => $value) {
             if (property_exists($this, $key)) {
                 $this->{$key} = (is_array($value)) ? array_merge_recursive($this->{$key}, $value) : $value;
             }
         }
+        $this->log('Scraper created');
         $this->client(new Client($this->clientOptions));
     }
 
@@ -186,10 +186,10 @@ class Scraper
             $this->log(['-----------------------------------', 'Run ' . $runs]);
             foreach ($this->pendingSources() as $key => $source) {
                 $result = $source->process();
-                if (is_object($result)) { // promise
+                if ($result instanceof Promise\Promise) { // promise
                     $this->log(['Adding promise', $key]);
                     $this->promises[$key] = $result;
-                } elseif (is_array($result)) { // single comment
+                } elseif (is_array($result) || is_object($result)) { // single comment
                     $this->comment($key, $result);
                 }
             }
