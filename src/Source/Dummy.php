@@ -36,8 +36,8 @@ class Dummy extends Source
     /**
      * Check if there are any comments on the page
      *
-     * @param object $dom
-     * @return boolean
+     * @param  \DiDom\Document $dom
+     * @return bool
      */
     public function hasComments($dom)
     {
@@ -47,7 +47,7 @@ class Dummy extends Source
     /**
      * Extract comments from DOM
      *
-     * @param object $dom
+     * @param  \DiDom\Document $dom
      * @return array
      */
     public function extractComments($dom)
@@ -56,7 +56,7 @@ class Dummy extends Source
         $nodes = $dom->find('.single-comment');
         foreach ($nodes as $node) {
             $comment = [];
-            $comment['text'] = $node->find('.text', 0)->plaintext;
+            $comment['text'] = $node->find('.text')[0]->text();
             $comments[] = $comment;
         }
         return $comments;

@@ -2,7 +2,7 @@
 
 namespace CommentScraper;
 
-use Sunra\PhpSimple\HtmlDomParser;
+use DiDom\Document;
 use ReflectionClass;
 
 /**
@@ -88,8 +88,8 @@ abstract class Source
     /**
      * Get/set request options
      *
-     * @param [type] $options
-     * @return [type]
+     * @param  null|array $options
+     * @return void|array
      */
     public function requestOptions($options = null)
     {
@@ -203,7 +203,7 @@ abstract class Source
         $this->status = static::STATUS_COMMENTS;
         $body = (string) $response->getBody();
         if (!empty($body)) {
-            $dom = HtmlDomParser::str_get_html($body);
+            $dom = new Document($body);
             if ($this->hasComments($dom)) {
                 $comments = $this->extractComments($dom);
                 $this->comments = $comments;
@@ -216,7 +216,7 @@ abstract class Source
     /**
      * Check if there are any comments on the page
      *
-     * @param object $dom
+     * @param  \DiDom\Document $dom
      * @return boolean
      */
     abstract public function hasComments($dom);
@@ -224,7 +224,7 @@ abstract class Source
     /**
      * Extract comments from DOM
      *
-     * @param object $dom
+     * @param  \DiDom\Document $dom
      * @return array
      */
     abstract public function extractComments($dom);

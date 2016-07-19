@@ -69,6 +69,7 @@ class Scraper
      * @var array
      */
     protected $clientOptions = [
+        'verify' => false, // disable SSL-certs verification
         'http_errors' => false,
         'timeout' => 10,
         'headers' => [
