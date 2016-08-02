@@ -71,7 +71,7 @@ class Scraper
     protected $clientOptions = [
         'verify' => false, // disable SSL-certs verification
         'http_errors' => false,
-        'timeout' => 10,
+        'timeout' => 120,
         'headers' => [
             'Accept'            => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Encoding'   => 'gzip, deflate, sdch',
